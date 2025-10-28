@@ -43,7 +43,7 @@ pipeline {
                             git config --global user.name "Jenkins"
                             git add build_log.txt
                             git commit -m "Auto update from Jenkins"
-                            git push https://${TOKEN}@github.com/alikhaled09/simple_calc.git main
+                            git push https://alikhaled09:${TOKEN}@github.com/alikhaled09/simple_calc.git main
                         '''
                     }
 
