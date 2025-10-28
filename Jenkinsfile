@@ -5,7 +5,6 @@ pipeline {
         stage('Clone Repo') {
             steps {
                git branch: 'main', url: 'https://github.com/alikhaled09/simple_calc.git'
-
             }
         }
 
@@ -31,15 +30,19 @@ pipeline {
 
         stage('Modify File and Push Back') {
             steps {
-                sh '''
-                    echo "Build completed successfully on $(date)" >> build_log.txt
-                    git config --global user.email "you@example.com"
-                    git config --global user.name "Jenkins"
-                    git add build_log.txt
-                    git commit -m "Auto update from Jenkins" || echo "No changes to commit"
-                    git push https://alikhaled09:<YOUR_GITHUB_TOKEN>@github.com/alikhaled09/simple_calc.git main
-                '''
+                script {
+                    sh 'date > build_log.txt'
+                    withCredentials([string(credentialsId: 'GITHUB_TOKEN', variable: 'TOKEN')]) {
+                        sh '''
+                            git config --global user.email "you@example.com"
+                            git config --global user.name "Jenkins"
+                            git add build_log.txt
+                            git commit -m "Auto update from Jenkins"
+                            git push https://${TOKEN}@github.com/alikhaled09/simple_calc.git main
+                        '''
+                    }
+                }
             }
         }
-    }
-}
+    } 
+} 
