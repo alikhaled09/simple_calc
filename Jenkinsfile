@@ -41,7 +41,7 @@ pipeline {
                     sh 'date > build_log.txt'
                     withCredentials([usernamePassword(credentialsId: 'github-token', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                         sh '''
-                            git config --global user.email "alikhaled09@gmail.com"
+                            git config --global user.email "alikkamal1000@gmail.com"
                             git config --global user.name "alikhaled09"
                             git add build_log.txt
                             git commit -m "Auto update from Jenkins" || echo "Nothing to commit"
