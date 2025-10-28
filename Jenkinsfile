@@ -36,17 +36,16 @@ pipeline {
         stage('Modify File and Push Back') {
             steps {
                 script {
-                   
                     sh 'date > build_log.txt'
-
-                
+                    
                     withCredentials([string(credentialsId: 'github-token', variable: 'TOKEN')]) {
+                       
                         sh """
                             git config --global user.email "alikhaled09@gmail.com"
                             git config --global user.name "Jenkins"
                             git add build_log.txt
-                            git commit -m "Auto update from Jenkins"
-                            git push https://${TOKEN}@github.com/alikhaled09/simple_calc.git ${BRANCH_NAME}
+                            git commit -m "Auto update from Jenkins" || echo "No changes to commit"
+                            git push https://\$TOKEN@github.com/alikhaled09/simple_calc.git ${BRANCH_NAME} || echo "Push failed"
                         """
                     }
                 }
