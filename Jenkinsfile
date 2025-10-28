@@ -1,10 +1,15 @@
 pipeline {
     agent any
 
+    environment {
+        GITHUB_REPO = 'https://github.com/alikhaled09/simple_calc.git'
+        BRANCH_NAME = 'main'
+    }
+
     stages {
         stage('Clone Repo') {
             steps {
-                git branch: 'main', url: 'https://github.com/alikhaled09/simple_calc.git'
+                git branch: "${BRANCH_NAME}", url: "${GITHUB_REPO}"
             }
         }
 
@@ -34,11 +39,11 @@ pipeline {
                     sh 'date > build_log.txt'
                     withCredentials([string(credentialsId: 'github-token', variable: 'TOKEN')]) {
                         sh '''
-                            git config --global user.email "alikhaled09@gmail.com"
-                            git config --global user.name "Jenkins"
+                            git config --global user.email "alikkamal1000@gmail.com"
+                            git config --global user.name "alikhaled09"
                             git add build_log.txt
-                            git commit -m "Auto update from Jenkins"
-                            git push https://${TOKEN}@github.com/alikhaled09/simple_calc.git main
+                            git commit -m "Auto update from Jenkins" || echo "No changes to commit"
+                            git push https://${TOKEN}@github.com/alikhaled09/simple_calc.git ${BRANCH_NAME}
                         '''
                     }
                 }
