@@ -36,7 +36,7 @@ pipeline {
         stage('Modify File and Push Back') {
             steps {
                 script {
-                 
+                        sh 'date > build_log.txt'
                    withCredentials([string(credentialsId: 'github-token', variable: 'TOKEN')]) {
                         sh '''
                             git config --global user.email "alikhaled09@gmail.com"
