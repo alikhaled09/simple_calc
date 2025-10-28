@@ -2,15 +2,19 @@ pipeline {
     agent any
 
     environment {
-        GITHUB_REPO = 'https://github.com/alikhaled09/simple_calc.git'
-        BRANCH_NAME = 'main'
+        GIT_REPO = 'https://github.com/alikhaled09/simple_calc.git'
+        BRANCH = 'main'
     }
 
     stages {
         stage('Clone Repo') {
             steps {
                 withCredentials([string(credentialsId: 'github-token', variable: 'TOKEN')]) {
-                    git branch: "${BRANCH_NAME}", url: "https://${TOKEN}@github.com/alikhaled09/simple_calc.git"
+                    sh """
+                        git config --global user.email "alikhaled09@gmail.com"
+                        git config --global user.name "Jenkins"
+                        git clone -b ${BRANCH} https://$TOKEN@github.com/alikhaled09/simple_calc.git repo
+                    """
                 }
             }
         }
@@ -18,6 +22,7 @@ pipeline {
         stage('Install Requirements') {
             steps {
                 sh '''
+                    cd repo
                     python3 -m venv venv
                     . venv/bin/activate
                     pip install --upgrade pip
@@ -29,26 +34,23 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh '''
+                    cd repo
                     . venv/bin/activate
                     pytest
                 '''
             }
         }
 
-        stage('Modify File and Push Back') {
+        stage('Modify and Push Back') {
             steps {
-                script {
-                    sh 'date > build_log.txt'
-                    withCredentials([usernamePassword(credentialsId: 'github-token', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                        sh '''
-                            git config --global user.email "alikkamal1000@gmail.com"
-                            git config --global user.name "alikhaled09"
-                            git add build_log.txt
-                            git commit -m "Auto update from Jenkins" || echo "Nothing to commit"
-                            git remote set-url origin https://$GIT_USERNAME:$GIT_PASSWORD@github.com/alikhaled09/simple_calc.git
-                            git push origin main
-                        '''
-                    }
+                withCredentials([string(credentialsId: 'github-token', variable: 'TOKEN')]) {
+                    sh '''
+                        cd repo
+                        date > build_log.txt
+                        git add build_log.txt
+                        git commit -m "Auto update from Jenkins"
+                        git push https://$TOKEN@github.com/alikhaled09/simple_calc.git main
+                    '''
                 }
             }
         }
