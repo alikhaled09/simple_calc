@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        GITHUB_REPO = 'git@github.com:alikhaled09/simple_calc.git' // استخدم SSH URL
+        GITHUB_REPO = 'git@github.com:alikhaled09/simple_calc.git'
         BRANCH_NAME = 'main'
     }
 
@@ -15,9 +15,10 @@ pipeline {
 
         stage('Install Requirements') {
             steps {
-                sh '''
-                    python3 -m venv venv
-                    . venv/bin/activate
+                // على Windows استخدم PowerShell
+                powershell '''
+                    python -m venv venv
+                    .\\venv\\Scripts\\Activate.ps1
                     pip install --upgrade pip
                     pip install pytest
                 '''
@@ -26,9 +27,9 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                sh '''
-                    . venv/bin/activate
-                    pytest || echo "No tests failed"
+                powershell '''
+                    .\\venv\\Scripts\\Activate.ps1
+                    pytest
                 '''
             }
         }
@@ -36,15 +37,16 @@ pipeline {
         stage('Modify File and Push Back') {
             steps {
                 script {
-                    sh 'date > build_log.txt'
-                    
-                    // Git config
-                    sh '''
-                        git config user.email "alikhaled09@gmail.com"
-                        git config user.name "Jenkins"
+                    // أعمل log بالتاريخ
+                    powershell 'date > build_log.txt'
+
+                    // Add, commit, push عبر SSH
+                    powershell '''
+                        git config --global user.email "alikhaled09@gmail.com"
+                        git config --global user.name "Jenkins"
                         git add build_log.txt
-                        git commit -m "Auto update from Jenkins" || echo "No changes to commit"
-                        git push origin main || echo "Push failed"
+                        git commit -m "Auto update from Jenkins" -a || echo "No changes to commit"
+                        git push origin main
                     '''
                 }
             }
