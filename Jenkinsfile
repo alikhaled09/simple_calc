@@ -1,20 +1,23 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'python:3.10'
+        }
+    }
 
     stages {
         stage('Clone Repo') {
             steps {
-                git branch: 'main', url: 'https://github.com/alikhaled09/simple_calc.git'
+                git 'https://github.com/alikhaled09/simple_calc.git'
             }
         }
 
         stage('Install Requirements') {
             steps {
                 sh '''
-                python3 -m venv venv
-                . venv/bin/activate
-                pip install --upgrade pip
-                pip install -r requirements.txt
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install -r requirements.txt
                 '''
             }
         }
@@ -22,8 +25,8 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh '''
-                . venv/bin/activate
-                pytest
+                    . venv/bin/activate
+                    pytest
                 '''
             }
         }
@@ -31,12 +34,12 @@ pipeline {
         stage('Modify File and Push Back') {
             steps {
                 sh '''
-                echo "Last build successful on $(date)" >> build_log.txt
-                git config --global user.email "you@example.com"
-                git config --global user.name "Ali Kamal"
-                git add build_log.txt
-                git commit -m "Auto update from Jenkins" || echo "No changes to commit"
-                git push https://alikhaled09:${GITHUB_TOKEN}@github.com/alikhaled09/simple_calc.git main
+                    echo "Build done at $(date)" >> build_log.txt
+                    git config user.email "you@example.com"
+                    git config user.name "Jenkins"
+                    git add build_log.txt
+                    git commit -m "Auto update from Jenkins"
+                    git push https://github.com/alikhaled09/simple_calc.git main || echo "No changes to push"
                 '''
             }
         }
