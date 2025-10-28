@@ -32,7 +32,7 @@ pipeline {
             steps {
                 script {
                     sh 'date > build_log.txt'
-                    withCredentials([string(credentialsId: 'GITHUB_TOKEN', variable: 'TOKEN')]) {
+                    withCredentials([string(credentialsId: 'github-creds', variable: 'TOKEN')]) {
                         sh '''
                             git config --global user.email "you@example.com"
                             git config --global user.name "Jenkins"
@@ -45,4 +45,4 @@ pipeline {
             }
         }
     } 
-} 
+}  
