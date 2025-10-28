@@ -39,14 +39,15 @@ pipeline {
             steps {
                 script {
                     sh 'date > build_log.txt'
-                    withCredentials([string(credentialsId: 'github-token', variable: 'TOKEN')]) {
-                        sh """
+                    withCredentials([usernamePassword(credentialsId: 'github-token', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                        sh '''
                             git config --global user.email "alikhaled09@gmail.com"
-                            git config --global user.name "Jenkins"
+                            git config --global user.name "alikhaled09"
                             git add build_log.txt
                             git commit -m "Auto update from Jenkins" || echo "Nothing to commit"
-                            git push https://${TOKEN}@github.com/alikhaled09/simple_calc.git main
-                        """
+                            git remote set-url origin https://$GIT_USERNAME:$GIT_PASSWORD@github.com/alikhaled09/simple_calc.git
+                            git push origin main
+                        '''
                     }
                 }
             }
